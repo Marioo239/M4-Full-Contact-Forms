@@ -1,6 +1,6 @@
 # Misión 4 · Full Contact Forms
 
-> **«Valida o muere.»** Registro de tripulación para una misión espacial ficticia: un formulario serio con **React Hook Form + Zod** y datos remotos con **TanStack Query v5**.
+**«Valida o muere.»** Registro de tripulación para una misión espacial ficticia: un formulario serio con **React Hook Form + Zod** y datos remotos con **TanStack Query v5**.
 
 ## Qué hace
 
@@ -8,10 +8,6 @@
 - **Listado** con filtro por rol, baja de tripulantes e invalidación automática tras cada cambio.
 - **Estados de interfaz** claros: cargando, error, éxito, vacío y "actualizando".
 - **Bonus:** la respuesta de la API también se valida con Zod (`safeParse`) y los datos corruptos se apartan sin romper la pantalla.
-
-## Stack
-
-React 18 · TypeScript · Vite · React Hook Form · Zod · `@hookform/resolvers` · TanStack Query v5 · Vitest · API mock en Node (sin dependencias).
 
 ## Cómo ejecutarlo
 
@@ -31,17 +27,20 @@ src/schemas/crew.test.ts  Tests
 ```
 
 ## Decisiones de diseño
+### Modo de validación `onTouched`
+- **Elegido:** validar al salir del campo y, desde entonces, en cada cambio.
+- **Alternativas:** `onSubmit` (solo al enviar) y `onChange` (en cada pulsación desde el primer carácter).
+- **Por qué:** `onChange` muestra errores mientras el usuario aún está escribiendo ("email inválido" tras teclear una `a`), lo cual resulta agresivo. `onSubmit` retrasa demasiado el feedback y el usuario se entera de todo al final. `onTouched` equilibra ambos: no molesta antes de tiempo, pero corrige rápido cuando ya has pasado por el campo.
 
-### React Hook Form
-- Formulario **no controlado**: `register` + `handleSubmit`; solo hay estado de React para el "mostrar contraseñas".
-- `mode: "onTouched"`: valida al salir del campo y, desde entonces, en cada pulsación. Sin ruido mientras se escribe por primera vez.
-- Accesibilidad: `noValidate`, `aria-invalid`, `aria-describedby` hacia hint/error, `role="alert"` en errores, foco automático al primer campo con error y `autoComplete` adecuado por campo.
-- Los errores del servidor ligados a un campo (email duplicado → `409`) se pintan en ese campo con `setError`.
+### `valueAsNumber` en lugar de `z.coerce.number()`
+- **Elegido:** `register("age", { valueAsNumber: true })` y `z.number()` con mensajes propios.
+- **Alternativa:** dejar el input como texto y convertir con `z.coerce.number()`.
+- **Por qué:** `coerce` convierte cadenas vacías en `0`, lo que dejaría pasar un campo en blanco como edad "0" y el error sería confuso. Con `valueAsNumber` el campo vacío da `NaN`, y `invalid_type_error` lo traduce a "Indica tu edad con un número".
 
-### Zod como única fuente de verdad
-- `crewFormSchema` define todas las reglas; los tipos salen de `z.input<>` y `z.infer<>`, no se duplican a mano.
-- Mensajes propios en español, `regex` Unicode para nombres, `refine`/`superRefine` entre campos (contraseñas iguales; la contraseña no puede contener el nombre de pila).
-- `valueAsNumber` + `invalid_type_error` para que un campo numérico vacío dé un mensaje humano, no "Expected number, received nan".
+### `keepPreviousData` al cambiar de filtro
+- **Elegido:** mantener la lista anterior atenuada mientras llega la nueva.
+- **Alternativa:** volver a mostrar los esqueletos.
+- **Por qué:** los esqueletos hacen "saltar" la pantalla cada vez que se toca el filtro. Mantener lo anterior da sensación de fluidez y el texto "Actualizando…" indica que hay una petición en curso.
 
 ### TanStack Query
 Claves jerárquicas:
@@ -54,18 +53,6 @@ Claves jerárquicas:
 
 - Tras `POST` y `DELETE` se hace `invalidateQueries({ queryKey: ["crew"] })`, que refresca cualquier lista con independencia del filtro activo. La promesa se devuelve para que `isPending` dure hasta que la lista está al día.
 - `placeholderData: keepPreviousData` evita parpadeos al cambiar de filtro; `signal` cancela peticiones obsoletas.
-
-### Feedback al usuario
-
-| Situación | Qué ve el usuario |
-|---|---|
-| Carga inicial | Esqueletos de tarjeta |
-| Refresco / cambio de filtro | "Actualizando…" y lista atenuada, sin perder contenido |
-| Enviando formulario | Botón deshabilitado con spinner y "Registrando…" |
-| Éxito | Banner verde (`role="status"`) y formulario reseteado |
-| Error de red / servidor | Banner rojo con el motivo y botón "Reintentar" (en la lista) |
-| Error de campo del servidor | Mensaje bajo el campo y foco en él |
-| Lista vacía | Mensaje que invita a la acción |
 
 ## Cómo probar los casos límite
 
