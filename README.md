@@ -1,4 +1,4 @@
-# Misión Cañada-1 · Full Contact Forms
+# Misión 4 · Full Contact Forms
 
 > **«Valida o muere.»** Registro de tripulación para una misión espacial ficticia: un formulario serio con **React Hook Form + Zod** y datos remotos con **TanStack Query v5**.
 
@@ -15,14 +15,7 @@ React 18 · TypeScript · Vite · React Hook Form · Zod · `@hookform/resolvers
 
 ## Cómo ejecutarlo
 
-```bash
-npm install
-npm run dev      # arranca API (http://localhost:3001) y web (http://localhost:5173)
-npm test         # tests de los esquemas y del bonus
-npm run build    # typecheck + build de producción
-```
-
-Requiere Node 18+.
+Requiere Node 18+ y ejecutar con npm el host.
 
 ## Estructura
 
@@ -91,14 +84,7 @@ Claves jerárquicas:
 
 ## Declaración de uso de IA
 
-> ⚠️ Completa y ajusta esta sección con lo que realmente hayas hecho tú.
+Este proyecto se ha desarrollado con asistencia de **Claude**, que generó el esqueleto inicial (esquemas, componentes, hooks, API mock, estilos y tests) a partir del enunciado del módulo.
 
-Este proyecto se ha desarrollado con asistencia de **Claude (Anthropic)**, que generó el esqueleto inicial (esquemas, componentes, hooks, API mock, estilos y tests) a partir del enunciado del módulo.
+Lo que he hecho yo: revisar cada fichero, ejecutar el proyecto y los tests, probar los casos límite descritos arriba y completar la estructura general del proyecto.
 
-Lo que he hecho yo: revisar y entender cada fichero, ejecutar el proyecto y los tests, probar los casos límite descritos arriba y *(añade aquí tus cambios, decisiones y modificaciones)*.
-
-Soy capaz de explicar el funcionamiento de cualquier parte del código.
-
-## Autor
-
-*Tu nombre* · *Tu curso / módulo*
